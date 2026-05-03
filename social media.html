@@ -1,0 +1,500 @@
+import React, { useState } from 'react';
+
+const App = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [completedSlides, setCompletedSlides] = useState({});
+  const [preQuizResult, setPreQuizResult] = useState(null);
+  const [sortResult, setSortResult] = useState({});
+  const [challengeAnswers, setChallengeAnswers] = useState({});
+  
+  // Zähler für die Bildergalerie
+  const [slideLikes, setSlideLikes] = useState({
+    traktor: 124, gaming: 210, hunde: 345, pizza: 189, weltraum: 256
+  });
+  const [userLikedSlides, setUserLikedSlides] = useState({});
+
+  const nextSlide = () => {
+    if (currentSlide < slides.length - 1) setCurrentSlide(currentSlide + 1);
+  };
+
+  const prevSlide = () => {
+    if (currentSlide > 0) setCurrentSlide(currentSlide - 1);
+  };
+
+  const markAsCompleted = (slideIndex) => {
+    setCompletedSlides(prev => ({ ...prev, [slideIndex]: true }));
+  };
+
+  const handleSlideLike = (id) => {
+    if (!userLikedSlides[id]) {
+      setSlideLikes(prev => ({ ...prev, [id]: prev[id] + 1 }));
+      setUserLikedSlides(prev => ({ ...prev, [id]: true }));
+    } else {
+      setSlideLikes(prev => ({ ...prev, [id]: prev[id] - 1 }));
+      setUserLikedSlides(prev => ({ ...prev, [id]: false }));
+    }
+    markAsCompleted(currentSlide);
+  };
+
+  const handleChallenge = (slideId, answer) => {
+    setChallengeAnswers(prev => ({ ...prev, [slideId]: answer }));
+    markAsCompleted(currentSlide);
+  };
+
+  const allCorrect = challengeAnswers['fake_news'] === 1 && challengeAnswers['chain_letter'] === 2 && challengeAnswers['privacy'] === 1;
+
+  const slides = [
+    {
+      type: "hero",
+      title: "Die Welt im Internet",
+      subtitle: "Apps, Likes und Fakten",
+      emoji: "🌐",
+      gradient: "from-slate-800 to-slate-900"
+    },
+    {
+      type: "instruction",
+      title: "Du bist dran!",
+      content: "Wir zeigen dir gleich ein paar Bilder. Klicke auf das Herz (das nennt man 'Like'), wenn dir ein Bild gefällt.",
+      emoji: "👆",
+      isInteractive: true
+    },
+    { type: "like_page", id: "traktor", label: "Starke Traktoren", emoji: "🚜", isInteractive: true },
+    { type: "like_page", id: "gaming", label: "Spiele & Zocken", emoji: "🕹️", isInteractive: true },
+    { type: "like_page", id: "hunde", label: "Süße Hunde", emoji: "🐶", isInteractive: true },
+    { type: "like_page", id: "pizza", label: "Leckeres Essen", emoji: "🍕", isInteractive: true },
+    { type: "like_page", id: "weltraum", label: "Sterne & Raketen", emoji: "🚀", isInteractive: true },
+    {
+      type: "memory_reveal",
+      title: "Das Internet vergisst nichts.",
+      content: "Die Apps merken sich genau, was du angeklickt hast.",
+      items: [
+        { id: "traktor", emoji: "🚜" },
+        { id: "gaming", emoji: "🕹️" },
+        { id: "hunde", emoji: "🐶" },
+        { id: "pizza", emoji: "🍕" },
+        { id: "weltraum", emoji: "🚀" }
+      ],
+      explanation: "Warum? Damit sie dir mehr davon zeigen können und du möglichst lange in der App bleibst."
+    },
+    {
+      type: "tiled_explanation",
+      title: "Echt oder erfunden?",
+      content: "Für mehr Likes wird im Internet oft getrickst.",
+      left: {
+        title: "Die Tricks",
+        text: "Bilder werden oft am Computer verändert oder komplett erfunden. Manche erzählen sogar Lügen für mehr Klicks.",
+        color: "bg-slate-50 border-slate-200 text-slate-800"
+      },
+      right: {
+        title: "Die Wahrheit",
+        text: "Leute zeigen meistens nur ihre besten Momente. Streit oder Langeweile bleiben geheim. Niemand ist immer perfekt!",
+        color: "bg-slate-800 border-slate-700 text-white"
+      },
+      isInteractive: true
+    },
+    {
+      type: "platform_card",
+      name: "TikTok",
+      reason: "Warum finden das alle so toll? Es macht riesigen Spaß, lustige Videos anzuschauen, bei Tänzen mitzumachen und sich kaputtzulachen.",
+      features: ["Lustige Tänze & Witze", "Coole Mitmach-Aufgaben (Challenges)", "Kurze Quatsch-Videos schauen"],
+      warning: "Jeder darf filmen. Niemand prüft, ob das, was im Video passiert, wirklich stimmt oder echt ist.",
+      color: "bg-black text-white",
+      emoji: "🎵"
+    },
+    {
+      type: "platform_card",
+      name: "Instagram",
+      reason: "Warum finden das alle so toll? Man kann zeigen, was man Tolles erlebt hat, schöne Erinnerungen sammeln und schauen, was die Lieblingsstars machen.",
+      features: ["Schöne Fotos von Freunden", "Stars & Idole verfolgen", "Kleine Tages-Berichte (Storys)"],
+      warning: "Fast alles ist mit Filtern bearbeitet und schöner gemacht, als es in echt ist.",
+      color: "bg-gradient-to-tr from-fuchsia-600 to-orange-500 text-white",
+      emoji: "📸"
+    },
+    {
+      type: "platform_card",
+      name: "Snapchat",
+      reason: "Warum finden das alle so toll? Es ist total lustig, sich verrückte Filter ins Gesicht zu zaubern und Freunden schnelle Quatsch-Bilder zu schicken.",
+      features: ["Nachrichten schicken", "Hunde-Ohren ins Gesicht zaubern", "Bilder, die sich von selbst löschen"],
+      warning: "Auch wenn Bilder verschwinden: Andere können heimlich ein Foto davon machen (Screenshot)!",
+      color: "bg-yellow-400 text-black",
+      emoji: "👻"
+    },
+    {
+      type: "quiz_transition",
+      title: "Kurze Frage...",
+      question: "Warum freuen sich Menschen so sehr über tausende Likes?",
+      options: [
+        { text: "Weil sich Aufmerksamkeit und Beliebtheit einfach toll anfühlen.", correct: true },
+        { text: "Weil man nur mit vielen Likes das Internet benutzen darf.", correct: false }
+      ],
+      state: preQuizResult,
+      setState: setPreQuizResult,
+      isInteractive: true,
+      explanation: "Richtig! Viele tun für dieses Gefühl fast alles – sogar flunkern."
+    },
+    {
+      type: "comparison_sort",
+      title: "Profis vs. Privatpersonen",
+      content: "Wer muss Informationen streng prüfen, bevor sie veröffentlicht werden?",
+      options: [
+        { id: "privat", text: "YouTuber & private Nutzer", isPro: false },
+        { id: "pro", text: "Journalisten (Nachrichten)", isPro: true }
+      ],
+      isInteractive: true
+    },
+    {
+      type: "danger_slide",
+      title: "Profis oder Quatsch-Köpfe?",
+      content: "Wusstest du? Auch echte Profis wie von der Sendung 'logo!' oder Zeitungen sind bei TikTok und Instagram. Das macht es knifflig: Da JEDER etwas hochladen darf, vermischen sich echte Nachrichten mit Lügen oder Quatsch. Du musst also wie ein Detektiv aufpassen: Ist das ein Profi oder flunkert da jemand?",
+      emoji: "🕵️‍♂️"
+    },
+    {
+      type: "list_rules",
+      title: "Deine Grundregeln",
+      points: [
+        { icon: "🔒", text: "Gib niemals private Daten (Name, Wohnort) preis." },
+        { icon: "🧠", text: "Glaube nicht alles. Hinterfrage verrückte Bilder oder Videos." },
+        { icon: "🗣️", text: "Sprich mit Eltern, wenn dir etwas Angst macht." }
+      ]
+    },
+    {
+      type: "danger_check_intro",
+      title: "Der Fake-Check",
+      content: "Zeig, was du gelernt hast. Bewerte die folgenden 3 Situationen.",
+      emoji: "🕵️",
+      isInteractive: true
+    },
+    {
+      type: "challenge",
+      id: "fake_news",
+      title: "Fall 1: Die unglaubliche Entdeckung",
+      question: "Ein Video zeigt, wie ein echter Dinosaurier durch einen Park läuft. Es hat Millionen Likes. Was denkst du?",
+      options: [
+        { text: "Es hat so viele Likes, es muss echt sein!", isDanger: true, feedback: "Falsch! Likes bedeuten nicht, dass etwas wahr ist. Viele fallen auf solche Tricks herein." },
+        { text: "Das ist ein Trick! Das Video wurde am Computer gebastelt.", isDanger: false, feedback: "Korrekt! Am Computer kann man heute Bilder und Videos verändern, sodass sie total echt aussehen." },
+        { text: "Ich teile es schnell mit Freunden, damit sie es auch sehen.", isDanger: true, feedback: "Bitte nicht! So hilfst du nur dabei, solche falschen Videos weiter zu verbreiten." }
+      ],
+      isInteractive: true
+    },
+    {
+      type: "challenge",
+      id: "chain_letter",
+      title: "Fall 2: Die Warnung",
+      question: "Jemand schickt dir: 'Wenn du das nicht an 10 Leute schickst, hast du 5 Jahre Pech!'",
+      options: [
+        { text: "Ich schicke es an 5 Leute. Sicher ist sicher.", isDanger: true, feedback: "Falsch! Das ist ein Kettenbrief. Niemand bekommt Pech durch eine App." },
+        { text: "Ich frage den Absender, ob das wirklich stimmt.", isDanger: true, feedback: "Das bringt nichts, der Absender hat den Brief wahrscheinlich selbst nur weitergeleitet." },
+        { text: "Ich lösche die Nachricht sofort und ignoriere sie.", isDanger: false, feedback: "Richtig! Kettenbriefe wollen nur Angst machen. Einfach löschen." }
+      ],
+      isInteractive: true
+    },
+    {
+      type: "challenge",
+      id: "privacy",
+      title: "Fall 3: Der nette Fremde",
+      question: "Ein nettes Kind schreibt: 'Du spielst echt gut! Auf welche Schule gehst du eigentlich?'",
+      options: [
+        { text: "Ich nenne ihm eine falsche Schule, um ihn auszutricksen.", isDanger: true, feedback: "Besser nicht. Auch Lügen verwickeln dich in Gespräche mit Fremden." },
+        { text: "Ich antworte gar nicht und blockiere den Nutzer.", isDanger: false, feedback: "Perfekt! Fremde im Netz gehen deine privaten Infos absolut nichts an." },
+        { text: "Ich nenne meine Schule, das ist ja nicht meine Adresse.", isDanger: true, feedback: "Gefährlich! Auch die Schule ist eine streng private Information." }
+      ],
+      isInteractive: true
+    },
+    {
+      type: "final_expert",
+      title: allCorrect ? "Check bestanden." : "Genauer hinschauen!",
+      content: allCorrect 
+        ? "Du weißt nun, worauf du achten musst. Bleib kritisch und pass auf deine Daten auf! Jetzt folgt ein echter Blick in Instagram." 
+        : "Ein echter Internet-Detektiv muss noch aufmerksamer sein. Pass in Zukunft gut auf, wem du im Internet glaubst! Jetzt folgt ein echter Blick in Instagram.",
+      emoji: allCorrect ? "✅" : "🔎"
+    }
+  ];
+
+  const current = slides[currentSlide];
+  const canGoNext = !current.isInteractive || completedSlides[currentSlide] || current.type === "like_page" || current.type === "instruction" || current.type === "tiled_explanation" || current.type === "memory_reveal" || current.type === "danger_check_intro";
+
+  return (
+    <div className="flex flex-col h-screen max-w-5xl mx-auto bg-slate-50 font-sans text-slate-800 shadow-2xl relative overflow-hidden">
+      
+      {/* Fortschrittsbalken oben (modern minimalistisch) */}
+      <div className="h-1.5 w-full bg-slate-200 z-20 absolute top-0 left-0">
+        <div 
+          className="h-full bg-blue-600 transition-all duration-500 ease-out" 
+          style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
+        ></div>
+      </div>
+
+      <header className="px-8 py-5 flex justify-between items-center z-10 relative">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center text-white font-bold text-sm shadow-sm">I</div>
+          <span className="font-semibold tracking-wide text-slate-700 text-sm uppercase">Internet-Check</span>
+        </div>
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{currentSlide + 1} / {slides.length}</span>
+      </header>
+
+      <main className="flex-grow flex items-center justify-center p-8 overflow-y-auto relative z-10">
+        <div className="w-full max-w-3xl">
+          
+          {current.type === "hero" && (
+            <div className={`p-16 rounded-3xl text-white shadow-xl bg-gradient-to-br ${current.gradient} text-center animate-in fade-in duration-700`}>
+              <div className="text-7xl mb-8 opacity-90">{current.emoji}</div>
+              <h1 className="text-5xl font-extrabold mb-4 tracking-tight">{current.title}</h1>
+              <p className="text-2xl opacity-80 font-light">{current.subtitle}</p>
+            </div>
+          )}
+
+          {current.type === "instruction" && (
+            <div className="text-center space-y-8 animate-in fade-in duration-500">
+              <div className="text-8xl mb-4">{current.emoji}</div>
+              <h2 className="text-4xl font-extrabold">{current.title}</h2>
+              <p className="text-xl text-slate-600 font-light max-w-lg mx-auto">
+                {current.content}
+              </p>
+              <button onClick={() => {markAsCompleted(currentSlide); nextSlide();}} className="bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition">Starten</button>
+            </div>
+          )}
+
+          {current.type === "like_page" && (
+            <div className="space-y-8 text-center animate-in fade-in zoom-in duration-300">
+              <h2 className="text-2xl font-bold text-slate-500">{current.label}</h2>
+              <div className="bg-white/60 backdrop-blur-md p-12 rounded-3xl border border-white shadow-lg flex flex-col items-center gap-6">
+                <span className="text-[7rem]">{current.emoji}</span>
+                <div className="flex flex-col items-center gap-3">
+                  <button 
+                    onClick={() => handleSlideLike(current.id)}
+                    className={`text-6xl transition-transform active:scale-110 hover:scale-105 ${userLikedSlides[current.id] ? "text-rose-500" : "grayscale opacity-30"}`}
+                  >
+                    ❤️
+                  </button>
+                  <div className="bg-white px-6 py-2 rounded-full shadow-sm border border-slate-100 flex items-center gap-2">
+                    <span className="text-xl font-bold text-slate-800">{slideLikes[current.id]}</span>
+                    <span className="text-sm font-medium text-slate-400">Likes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {current.type === "memory_reveal" && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <h2 className="text-3xl font-extrabold text-center">{current.title}</h2>
+              <p className="text-lg text-center text-slate-500 font-light max-w-xl mx-auto">{current.content}</p>
+              
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <div className="flex justify-around items-center mb-8">
+                  {current.items.map(item => (
+                    <div key={item.id} className="flex flex-col items-center gap-3">
+                      <span className="text-4xl">{item.emoji}</span>
+                      <div className={`text-2xl ${userLikedSlides[item.id] ? "text-rose-500" : "opacity-20"}`}>
+                        {userLikedSlides[item.id] ? "❤️" : "🤍"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                  <p className="text-slate-600 text-center text-sm font-medium">
+                    {current.explanation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {current.type === "tiled_explanation" && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <h2 className="text-3xl font-extrabold text-center">{current.title}</h2>
+              <p className="text-lg text-center text-slate-500 font-light mb-8">{current.content}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className={`p-8 rounded-2xl border shadow-sm ${current.left.color}`}>
+                   <h3 className="text-xl font-bold mb-3 uppercase tracking-wider text-xs">1. {current.left.title}</h3>
+                   <p className="font-light text-base">{current.left.text}</p>
+                </div>
+                <div className={`p-8 rounded-2xl border shadow-sm ${current.right.color}`}>
+                   <h3 className="text-xl font-bold mb-3 uppercase tracking-wider text-xs text-slate-300">2. {current.right.title}</h3>
+                   <p className="font-light text-base text-slate-300">{current.right.text}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {current.type === "platform_card" && (
+            <div className={`${current.color} rounded-3xl p-10 shadow-xl relative overflow-hidden animate-in fade-in duration-500`}>
+               <div className="absolute -top-4 -right-4 text-[10rem] opacity-10 pointer-events-none leading-none">{current.emoji}</div>
+               <div className="relative z-10">
+                 <h2 className="text-4xl font-extrabold mb-4 tracking-tight">{current.name}</h2>
+                 {current.reason && <p className="text-lg font-medium mb-6 opacity-90 leading-relaxed">{current.reason}</p>}
+                 <div className="space-y-3 mb-8">
+                   {current.features.map((f, i) => (
+                     <div key={i} className="flex items-center gap-3 text-lg font-medium bg-white/10 p-3 rounded-xl backdrop-blur-sm w-fit border border-white/5">
+                       <span className="opacity-70 text-sm">✓</span> {f}
+                     </div>
+                   ))}
+                 </div>
+                 <div className="bg-white text-slate-900 p-5 rounded-xl border-l-4 border-rose-500 shadow-sm text-sm font-medium">
+                   <strong className="text-rose-600 block mb-1">Achtung:</strong> {current.warning}
+                 </div>
+               </div>
+            </div>
+          )}
+
+          {current.type === "quiz_transition" && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <h2 className="text-xl font-semibold text-center text-blue-600 uppercase tracking-widest">{current.title}</h2>
+              <div className="bg-white p-10 rounded-3xl border border-slate-200 shadow-sm">
+                <p className="text-2xl font-bold mb-8 text-center">{current.question}</p>
+                <div className="flex flex-col gap-4">
+                  {current.options.map((opt, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => { current.setState(i); markAsCompleted(currentSlide); }}
+                      className={`p-5 rounded-xl text-lg font-medium transition-all text-left border ${
+                        current.state === i 
+                        ? (opt.correct ? "bg-emerald-50 border-emerald-500 text-emerald-800" : "bg-rose-50 border-rose-500 text-rose-800")
+                        : "bg-slate-50 border-slate-200 hover:border-blue-400"
+                      }`}
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+                {current.state !== null && (
+                  <div className="mt-6 text-center text-slate-500 text-sm font-medium animate-in fade-in">
+                    {current.options[current.state].correct ? current.explanation : "Denk an das Gefühl von Aufmerksamkeit."}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {current.type === "comparison_sort" && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h2 className="text-3xl font-extrabold mb-3">{current.title}</h2>
+                <p className="text-slate-500">{current.content}</p>
+              </div>
+              <div className="grid gap-4">
+                {current.options.map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => {
+                      setSortResult(prev => ({...prev, [opt.id]: true}));
+                      if (opt.isPro) markAsCompleted(currentSlide);
+                    }}
+                    className={`p-6 rounded-xl border text-lg font-medium flex items-center justify-between transition-all ${
+                      sortResult[opt.id] 
+                        ? (opt.isPro ? "bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm" : "bg-rose-50 border-rose-500 text-rose-800 opacity-60")
+                        : "bg-white border-slate-200 hover:border-slate-300 shadow-sm"
+                    }`}
+                  >
+                    {opt.text}
+                    {sortResult[opt.id] && (opt.isPro ? "✅" : "❌")}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {current.type === "danger_slide" && (
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="p-6 border-b border-slate-100 flex items-center gap-4 bg-blue-50/50">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl shadow-sm">💡</div>
+                <div className="font-bold text-slate-900 text-lg uppercase tracking-wider">{current.title}</div>
+              </div>
+              <div className="p-12 text-center">
+                <div className="text-[8rem] mb-8 drop-shadow-sm">{current.emoji}</div>
+                <p className="text-xl text-slate-700 leading-relaxed font-medium max-w-2xl mx-auto">
+                  {current.content}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {current.type === "list_rules" && (
+            <div className="space-y-8">
+              <h2 className="text-3xl font-extrabold text-center mb-8">{current.title}</h2>
+              <div className="grid gap-4">
+                {current.points.map((p, i) => (
+                  <div key={i} className="flex items-center gap-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <span className="text-3xl shrink-0 opacity-80">{p.icon}</span>
+                    <span className="text-lg font-medium text-slate-700">{p.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {current.type === "danger_check_intro" && (
+            <div className="text-center space-y-8 animate-in zoom-in duration-500">
+              <div className="text-7xl mb-4">{current.emoji}</div>
+              <h2 className="text-4xl font-extrabold">{current.title}</h2>
+              <p className="text-xl text-slate-500 font-light">
+                {current.content}
+              </p>
+              <button onClick={() => {markAsCompleted(currentSlide); nextSlide();}} className="bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition">Checks starten</button>
+            </div>
+          )}
+
+          {current.type === "challenge" && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest text-center">{current.title}</h2>
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md">
+                <p className="text-xl font-semibold mb-8 text-center">{current.question}</p>
+                <div className="grid gap-3">
+                  {current.options.map((opt, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => handleChallenge(current.id, i)}
+                      className={`p-4 rounded-xl text-base font-medium transition-all text-left border ${
+                        challengeAnswers[current.id] === i 
+                        ? (opt.isDanger ? "bg-rose-50 border-rose-500 text-rose-800" : "bg-emerald-50 border-emerald-500 text-emerald-800")
+                        : "bg-slate-50 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+                {challengeAnswers[current.id] !== undefined && (
+                  <div className={`mt-6 p-4 rounded-lg text-sm font-medium text-center animate-in slide-in-from-top-2 ${
+                    current.options[challengeAnswers[current.id]].isDanger ? "text-rose-600 bg-rose-50/50" : "text-emerald-700 bg-emerald-50/50"
+                  }`}>
+                    {current.options[challengeAnswers[current.id]].feedback}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {current.type === "final_expert" && (
+            <div className="p-12 rounded-3xl bg-white border border-slate-200 shadow-xl text-center animate-in fade-in zoom-in duration-700">
+              <div className="text-6xl mb-6">{current.emoji}</div>
+              <h1 className="text-3xl font-extrabold mb-4">{current.title}</h1>
+              <p className="text-lg text-slate-500 font-light">{current.content}</p>
+            </div>
+          )}
+
+        </div>
+      </main>
+
+      <footer className="px-8 py-4 bg-white/50 backdrop-blur border-t border-slate-200 flex justify-between items-center z-10">
+        <button 
+          onClick={prevSlide}
+          className={`px-6 py-2 text-sm font-semibold text-slate-400 hover:text-slate-700 transition-colors ${currentSlide === 0 ? "invisible" : ""}`}
+        >
+          Zurück
+        </button>
+        <button 
+          onClick={nextSlide}
+          disabled={!canGoNext}
+          className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
+            canGoNext ? "bg-slate-900 text-white hover:bg-slate-800 shadow-sm" : "bg-slate-200 text-slate-400 cursor-not-allowed"
+          }`}
+        >
+          {currentSlide === slides.length - 1 ? "Fertig" : "Weiter"}
+        </button>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
